@@ -166,7 +166,9 @@ public class ScatterPlot {
          * line it will be removed.
          */
         for (Point n : par) {
+            System.out.println("n - (" + n.pos[0] + "," + n.pos[1] + ")");
             for (Point n2 : par) {
+                System.out.println("n2 - (" + n2.pos[0] + "," + n2.pos[1] + ")");
                 if (n != n2) {
                     Line temp = new Line(n, n2);
                     boolean allow = true;
@@ -185,6 +187,13 @@ public class ScatterPlot {
                 }
             }
         }
+
+        int i = 0;
+        for (Line l : lines.toArray(new Line[0])) {
+            System.out.println("y = " + l.m + "x + " + l.b);
+            i += 1;
+        }
+
 
         return lines.toArray(new Line[0])[1].m;
     }
