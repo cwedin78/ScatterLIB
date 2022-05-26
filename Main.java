@@ -9,6 +9,6 @@ public class Main {
         plot.AddPoints(new Point(1, 6, 5));
         plot.AddPoints(new Point(.5, 1, 5));
         plot.AddPoints(new Point(4,6,6));
-        System.out.println(plot.Calculate(1, 3));
+        System.out.println(plot.Calculate(3.3,1));
     }
 }

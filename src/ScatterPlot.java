@@ -59,19 +59,25 @@ public class ScatterPlot {
          * within line As point boundaries
          * @param A Line A
          * @param B Line B
+         * @param Tol Tolerance
          * @returns True if lines do not collide 
          * within line As boundaries
          */
-        public static boolean CheckCollision(Line A, Line B) {
-            if (A.m == B.m) {
-                return (  // works
+        public static boolean CheckCollision(Line A, Line B, double Tol) {
+            if (A.m == B.m) { // Divide by 0 catch
+                return ( 
                     (A.m * (A.points[0].pos[0]) + A.points[0].pos[1]) != 
                     (B.m * (B.points[0].pos[0]) + B.points[0].pos[1])
                 );
             } else {
                 return (
-                    ((A.b - B.b) / (B.m - A.m) <= A.points[0].pos[0] || (A.b - B.b) / (B.m - A.m) <= B.points[0].pos[0]) ||
-                    ((A.b - B.b) / (B.m - A.m) >= A.points[1].pos[0] || (A.b - B.b) / (B.m - A.m) <= B.points[1].pos[0])
+                    (
+                        (A.b - B.b) / (B.m - A.m) <= (A.points[0].pos[0] + Tol) || 
+                        (A.b - B.b) / (B.m - A.m) <= (B.points[0].pos[0] + Tol)
+                    ) || (
+                        (A.b - B.b) / (B.m - A.m) >= (A.points[1].pos[0] - Tol) || 
+                        (A.b - B.b) / (B.m - A.m) >= (B.points[1].pos[0] - Tol)
+                    )
                 );
             }
         }
@@ -128,7 +134,7 @@ public class ScatterPlot {
      */
     public double Calculate(double... inp) {
 
-        switch ( inp.length ) {
+        switch (inp.length) {
             case 1:
                 return seq2d(inp[0]);
             
@@ -142,7 +148,7 @@ public class ScatterPlot {
 
     double seq3d(double x, double y) {
         List<Line> lines = new ArrayList<Line>();
-        Point[] par = (Point[]) points.toArray(new Point[0]);
+        Point[] par = points.toArray(new Point[0]);
 
         /**
          * Term 2, parsing through all points 
@@ -166,18 +172,18 @@ public class ScatterPlot {
                     boolean allow = true;
 
                     for (Line l : lines.toArray(new Line[0])) {
-                        if (!Line.CheckCollision(l, temp)) {allow = false;}
+                        if (!Line.CheckCollision(l, temp, 0.001)) {
+                            allow = false;
+                            System.out.println("y = " + temp.m + "x + " + temp.b + " - failed");
+                        }
                     }
 
-                    if (allow) {lines.add(temp);}
+                    if (allow) {
+                        lines.add(temp);
+                        System.out.println("y = " + temp.m + "x + " + temp.b + " - success");
+                    }
                 }
             }
-        }
-
-        int i = 0;
-        for (Line l : lines.toArray(new Line[0])) {
-            System.out.println(i  + " - y = " + l.m + "x + " + l.b);
-            i += 1;
         }
 
         return lines.toArray(new Line[0])[1].m;
