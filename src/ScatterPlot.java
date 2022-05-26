@@ -30,6 +30,7 @@ public class ScatterPlot {
     public static class Line {
         public Point[] points = {null,null};
         public double m; // slope
+        public double b; // y intercept
 
         /**
          * Creates a new line. The first two given values 
@@ -46,9 +47,33 @@ public class ScatterPlot {
          * @return self
          */
         public Line set(Point A, Point B) {
-            points[0] = A; points[1] = B;
+            points = ScatterPlot.PointSort(A,B);
             m = (A.pos[1] - B.pos[1]) / (A.pos[0] - B.pos[0]);
+            b = m * (-A.pos[0]) + A.pos[1];
+
             return this;
+        }
+
+        /**
+         * Returns if line B collides with line A 
+         * within line As point boundaries
+         * @param A Line A
+         * @param B Line B
+         * @returns True if lines do not collide 
+         * within line As boundaries
+         */
+        public static boolean CheckCollision(Line A, Line B) {
+            if (A.m == B.m) {
+                return (  // works
+                    (A.m * (A.points[0].pos[0]) + A.points[0].pos[1]) != 
+                    (B.m * (B.points[0].pos[0]) + B.points[0].pos[1])
+                );
+            } else {
+                return (
+                    (A.b - B.b) / (B.m - A.m) <= A.points[0].pos[0] ||
+                    (A.b - B.b) / (B.m - A.m) >= A.points[1].pos[0]
+                );
+            }
         }
     }
 
@@ -80,7 +105,7 @@ public class ScatterPlot {
      * @return pointArr of sorted points
      * @see hehe stolen from stackoverflow
      */
-    public Point[] PointSort(Point[] pointArr) {
+    public static Point[] PointSort(Point... pointArr) {
         for(double j=0; j<pointArr.length-1; j++){
             for(int i=0; i<pointArr.length-1; i++){
                 if (pointArr[i].pos[0] > pointArr[i+1].pos[0]){
@@ -103,18 +128,16 @@ public class ScatterPlot {
      */
     public double Calculate(double... inp) {
 
-        switch ( ((Point) points.toArray()[0]) .pos. length) {
-            case 2:
-                break;
+        switch ( inp.length ) {
+            case 1:
+                return seq2d(inp[0]);
             
-            case 3:
+            case 2:
                 return seq3d(inp[0], inp[1]);
         
             default:
                 return 0;
         }
-
-        return 0;
     }
 
     double seq3d(double x, double y) {
@@ -127,6 +150,46 @@ public class ScatterPlot {
             lines.add(new Line(par[i], par[i+1]));
         }
 
+        for (Point n : par) {
+            for (Point n2 : par) {
+                if (n != n2) {
+                    Line temp = new Line(n, n2);
+                    boolean allow = true;
+                    for (Line l : lines.toArray(new Line[0])) {
+                        if (Line.CheckCollision(temp, l)) {
+                            lines.add(temp);
+                        }
+                    }
+                }
+            }
+        }
+
         return lines.toArray(new Line[0])[1].m;
+    }
+
+    double seq2d(double x) {
+        List<Line> lines = new ArrayList<Line>();
+        Point[] par = (Point[]) points.toArray(new Point[0]);
+
+        // Term 1, parsing through points from lowest 
+        // x to highest x and drawing lines between
+        for (int i = 0; i < par.length - 1; i++) {
+            lines.add(new Line(par[i], par[i+1]));
+        }
+
+        double totSlope = 0;
+        for (Line l : lines.toArray(new Line[0])) {totSlope += l.m;}
+        double avSlope = (totSlope / lines.toArray().length);
+
+        Line[] ls = lines.toArray(new Line[0]);
+        double baseReturn = avSlope * (x - ls[0].points[0].pos[0]) + ls[0].points[0].pos[1];
+
+        for (Line l : lines.toArray(new Line[0])) {
+            if (x >= l.points[0].pos[0] && (x < l.points[1].pos[0])) {
+                return l.m * (x - l.points[0].pos[0]) + l.points[0].pos[1];
+            }
+        }
+
+        return baseReturn;
     }
 }
