@@ -70,8 +70,8 @@ public class ScatterPlot {
                 );
             } else {
                 return (
-                    (A.b - B.b) / (B.m - A.m) <= A.points[0].pos[0] ||
-                    (A.b - B.b) / (B.m - A.m) >= A.points[1].pos[0]
+                    ((A.b - B.b) / (B.m - A.m) <= A.points[0].pos[0] || (A.b - B.b) / (B.m - A.m) <= B.points[0].pos[0]) ||
+                    ((A.b - B.b) / (B.m - A.m) >= A.points[1].pos[0] || (A.b - B.b) / (B.m - A.m) <= B.points[1].pos[0])
                 );
             }
         }
@@ -144,24 +144,40 @@ public class ScatterPlot {
         List<Line> lines = new ArrayList<Line>();
         Point[] par = (Point[]) points.toArray(new Point[0]);
 
-        // Term 1, parsing through points from lowest 
-        // x to highest x and drawing lines between
+        /**
+         * Term 2, parsing through all points 
+         * from lowest x to highest x, and creating
+         * lines in between
+         */
         for (int i = 0; i < par.length - 1; i++) {
             lines.add(new Line(par[i], par[i+1]));
         }
 
+        /** 
+         * Term 2, parsing through all points from
+         * each point from lowest x to highest x, and attempting
+         * to create a line. If the created line crosses an existing
+         * line it will be removed.
+         */
         for (Point n : par) {
             for (Point n2 : par) {
                 if (n != n2) {
                     Line temp = new Line(n, n2);
                     boolean allow = true;
+
                     for (Line l : lines.toArray(new Line[0])) {
-                        if (Line.CheckCollision(temp, l)) {
-                            lines.add(temp);
-                        }
+                        if (!Line.CheckCollision(l, temp)) {allow = false;}
                     }
+
+                    if (allow) {lines.add(temp);}
                 }
             }
+        }
+
+        int i = 0;
+        for (Line l : lines.toArray(new Line[0])) {
+            System.out.println(i  + " - y = " + l.m + "x + " + l.b);
+            i += 1;
         }
 
         return lines.toArray(new Line[0])[1].m;
