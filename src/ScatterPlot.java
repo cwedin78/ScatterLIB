@@ -188,10 +188,21 @@ public class ScatterPlot {
             }
         }
 
-        int i = 0;
         for (Line l : lines.toArray(new Line[0])) {
             System.out.println("y = " + l.m + "x + " + l.b);
-            i += 1;
+        }
+
+        /**
+         * Triangle identification
+         * 
+         * Rules are as follows:
+         *  line A must share a point with line B, line C must not share
+         *  the same point like A and B share, and line C must share a point
+         *  with line A and line B.
+         * 
+         */
+        for (Line A : lines.toArray(new Line[0])) {
+            
         }
 
 
