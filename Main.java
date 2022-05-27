@@ -8,9 +8,8 @@ public class Main {
              new Point(3, 5, 5)
             ,new Point(1, 6, 5)
             ,new Point(2, 3, 5)
-            ,new Point(2.1, 7, 5)
-            ,new Point(2.9, 4, 5)
-            ,new Point(1.9,5,6)
+            ,new Point(4, 8, 5)
+            ,new Point(2.25, 5, 5)
         );
         System.out.println(plot.Calculate(3.3,1));
     }

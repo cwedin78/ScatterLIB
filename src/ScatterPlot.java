@@ -92,7 +92,7 @@ public class ScatterPlot {
          */
         public static Point CheckCommonPoint(Line A, Line B) {
             for (Point pa : A.points) {
-                for (Point pb : B.points {
+                for (Point pb : B.points) {
                     if(pa == pb) {return pa;}
                 }
             }
@@ -107,12 +107,24 @@ public class ScatterPlot {
      * lines, and boundaries.
      */
     public static class Triangle {
-        public Point[] points = {null,null,null}
-        public Line[] lines = {null,null,null}
+        public Point[] points = {null,null,null};
+        public Line[] lines = {null,null,null};
 
+        /**
+         * Creates a new triangle with defined points,
+         * and assumed lines
+         * @param A Point A
+         * @param B Point B
+         * @param C Point C
+         */
         public Triangle(Point A, Point B, Point C) {
-            
+            points = ScatterPlot.PointSort(A,B,C);
+            lines[0] = new Line(points[0], points[1]);
+            lines[1] = new Line(points[1], points[2]);
+            lines[2] = new Line(points[0], points[2]);
         }
+
+        
     }
 
     /*
@@ -180,6 +192,7 @@ public class ScatterPlot {
 
     double seq3d(double x, double y) {
         List<Line> lines = new ArrayList<Line>();
+        List<Triangle> triangles = new ArrayList<Triangle>();
         Point[] par = points.toArray(new Point[0]);
 
         /**
@@ -234,18 +247,37 @@ public class ScatterPlot {
          * 
          */
         for (Line A : lines.toArray(new Line[0])) {
-            for (Line B : lines.toArray(new Line[0]) {
+            for (Line B : lines.toArray(new Line[0])) {
                 if (A != B) {
                     Point AB = Line.CheckCommonPoint(A, B);
                     if (AB != null) {
-                        for (Line C : lines.toArray(new Line[0)) {
+                        for (Line C : lines.toArray(new Line[0])) {
                             if (C != A && C != B) {
                                 Point AC = Line.CheckCommonPoint(A,C);
                                 Point BC = Line.CheckCommonPoint(B,C);
                                 if (AC != null && BC != null
                                 && AC != AB && BC != AB
                                 ) {
-                                    // Point set created
+                                    Triangle t = new Triangle(AB, AC, BC);
+
+                                    boolean allow = true;
+                                    for (Triangle tri : triangles.toArray(new Triangle[0])) {
+                                        if (
+                                            t.points[0].pos == tri.points[0].pos &&
+                                            t.points[1].pos == tri.points[1].pos &&
+                                            t.points[2].pos == tri.points[2].pos
+                                        ) {
+                                            allow = false;
+                                        }
+                                    }
+
+                                    if (allow) {
+                                        triangles.add(t);
+                                        System.out.println("Created new triangle via - (" +
+                                        t.points[0].pos[0] + "," + t.points[0].pos[1] + ") (" +
+                                        t.points[1].pos[0] + "," + t.points[1].pos[1] + ") (" +
+                                        t.points[2].pos[0] + "," + t.points[2].pos[1] + ")");
+                                    }
                                 }
                             }
                         }
