@@ -81,6 +81,8 @@ public class ScatterPlot {
                 );
             }
         }
+
+        public static Point CheckCommonPoint(Line A, Line B) {}
     }
 
     /**
@@ -202,7 +204,9 @@ public class ScatterPlot {
          * 
          */
         for (Line A : lines.toArray(new Line[0])) {
-            
+            for (Line B : lines.toArray(new Line[0]) {
+                // Check if lines share a point
+            } 
         }
 
 
