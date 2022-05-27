@@ -7,13 +7,13 @@ public class ScatterPlot {
 
     List<Point> points = new ArrayList<Point>();
 
-    /**
+    /*
      * Used to represent a point for the scatterplot lib
      */
     public static class Point {
         public double[] pos;
         public final int dim;
-        /**
+        /*
          * Creates a new point in the dimension equal to the
          * number of values given
          * @param vals X, Y, Z... coords
@@ -24,7 +24,7 @@ public class ScatterPlot {
         }
     }
 
-    /**
+    /*
      * A class holding information for a 2d line, including points and slopes.
      */
     public static class Line {
@@ -32,7 +32,7 @@ public class ScatterPlot {
         public double m; // slope
         public double b; // y intercept
 
-        /**
+        /*
          * Creates a new line. The first two given values 
          * of the points will be used in data
          * @param A Point A
@@ -40,7 +40,7 @@ public class ScatterPlot {
          */
         public Line(Point A, Point B) {set(A, B);}
 
-        /**
+        /*
          * Sets existing parameters of a line
          * @param A Point A
          * @param B Point B
@@ -54,7 +54,7 @@ public class ScatterPlot {
             return this;
         }
 
-        /**
+        /*
          * Returns if line B collides with line A 
          * within line As point boundaries
          * @param A Line A
@@ -82,10 +82,40 @@ public class ScatterPlot {
             }
         }
 
-        public static Point CheckCommonPoint(Line A, Line B) {}
+        /*
+         * Checks if two lines meet at a point
+         * @param A Line A
+         * @param B Lime B
+         * @returns the point at which the
+         * lines meet, if the lines do not
+         * meet, null is returned.
+         */
+        public static Point CheckCommonPoint(Line A, Line B) {
+            for (Point pa : A.points) {
+                for (Point pb : B.points {
+                    if(pa == pb) {return pa;}
+                }
+            }
+
+            return null;
+        }
     }
 
-    /**
+    /*
+     * A class holding all information to
+     * define a Triangle, including points,
+     * lines, and boundaries.
+     */
+    public static class Triangle {
+        public Point[] points = {null,null,null}
+        public Line[] lines = {null,null,null}
+
+        public Triangle(Point A, Point B, Point C) {
+            
+        }
+    }
+
+    /*
      * Creates a scatterplot of any dimension
      * @param Points Any number of points to be initially plotted within
      * the scatterplot
@@ -95,7 +125,7 @@ public class ScatterPlot {
     }
 
 
-    /**
+    /*
      * Adds points to the existing scatterplot
      * @param Points Any number of points to be plotted 
      * within the scatterplot
@@ -107,7 +137,7 @@ public class ScatterPlot {
         for (Point p : par) {points.add(p);}
     }
 
-    /**
+    /*
      * Sorts given points from lowest X to highest X. (N^2)
      * @param pointArr Array of given points
      * @return pointArr of sorted points
@@ -127,7 +157,7 @@ public class ScatterPlot {
         return pointArr;
     }
 
-    /**
+    /*
      * Assumes an output based upon given data
      * at the given position
      * @param inp Input coordinated to assume an output at,
@@ -161,7 +191,7 @@ public class ScatterPlot {
             lines.add(new Line(par[i], par[i+1]));
         }
 
-        /** 
+        /*
          * Term 2, parsing through all points from
          * each point from lowest x to highest x, and attempting
          * to create a line. If the created line crosses an existing
@@ -194,7 +224,7 @@ public class ScatterPlot {
             System.out.println("y = " + l.m + "x + " + l.b);
         }
 
-        /**
+        /*
          * Triangle identification
          * 
          * Rules are as follows:
@@ -205,7 +235,22 @@ public class ScatterPlot {
          */
         for (Line A : lines.toArray(new Line[0])) {
             for (Line B : lines.toArray(new Line[0]) {
-                // Check if lines share a point
+                if (A != B) {
+                    Point AB = Line.CheckCommonPoint(A, B);
+                    if (AB != null) {
+                        for (Line C : lines.toArray(new Line[0)) {
+                            if (C != A && C != B) {
+                                Point AC = Line.CheckCommonPoint(A,C);
+                                Point BC = Line.CheckCommonPoint(B,C);
+                                if (AC != null && BC != null
+                                && AC != AB && BC != AB
+                                ) {
+                                    // Point set created
+                                }
+                            }
+                        }
+                    }
+                }
             } 
         }
 
