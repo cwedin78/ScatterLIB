@@ -107,10 +107,12 @@ public class ScatterPlot {
      * lines, and boundaries.
      */
     public static class Triangle {
+        //                         A    B    C
         public Point[] points = {null,null,null};
+        //                      AB   AC   BC
         public Line[] lines = {null,null,null};
 
-        /**
+        /*
          * Creates a new triangle with defined points,
          * and assumed lines
          * @param A Point A
@@ -120,8 +122,22 @@ public class ScatterPlot {
         public Triangle(Point A, Point B, Point C) {
             points = ScatterPlot.PointSort(A,B,C);
             lines[0] = new Line(points[0], points[1]);
-            lines[1] = new Line(points[1], points[2]);
-            lines[2] = new Line(points[0], points[2]);
+            lines[1] = new Line(points[0], points[2]);
+            lines[2] = new Line(points[1], points[2]);
+        }
+
+        /*
+         * Checks if a given point is within
+         * the boundaries of the triangle 
+         * @returns true if the point is inside the triangle
+         */
+        public boolean CheckBoundaries(Point point) {
+                if (points[1].pos[0] > lines[2].m * (points[1].pos[0]) + lines[2].b) {
+
+                } else {
+                    
+                }
+            return false;
         }
 
         
@@ -245,6 +261,13 @@ public class ScatterPlot {
          *  the same point like A and B share, and line C must share a point
          *  with line A and line B.
          * 
+         * TODO BUG: a triangle can be created when a point is inside it:
+         *         Created new triangle via - (1.0,6.0) (2.0,4.0) (2.2,7.0)
+         *         Created new triangle via - (2.0,4.0) (2.2,7.0) (2.5,3.0)
+         *         Created new triangle via - (2.2,7.0) (2.5,3.0) (3.0,5.0)
+         *         Created new triangle via - (2.2,7.0) (2.5,3.0) (4.0,4.0)
+         *         Created new triangle via - (2.5,3.0) (3.0,5.0) (4.0,4.0)
+         *         Created new triangle via - (2.2,7.0) (3.0,5.0) (4.0,4.0)
          */
         for (Line A : lines.toArray(new Line[0])) {
             for (Line B : lines.toArray(new Line[0])) {
@@ -263,9 +286,11 @@ public class ScatterPlot {
                                     boolean allow = true;
                                     for (Triangle tri : triangles.toArray(new Triangle[0])) {
                                         if (
-                                            t.points[0].pos == tri.points[0].pos &&
-                                            t.points[1].pos == tri.points[1].pos &&
-                                            t.points[2].pos == tri.points[2].pos
+                                            (
+                                                t.points[0].pos == tri.points[0].pos &&
+                                                t.points[1].pos == tri.points[1].pos &&
+                                                t.points[2].pos == tri.points[2].pos
+                                            )
                                         ) {
                                             allow = false;
                                         }
@@ -287,7 +312,7 @@ public class ScatterPlot {
         }
 
 
-        return lines.toArray(new Line[0])[1].m;
+        return 0;
     }
 
     double seq2d(double x) {
