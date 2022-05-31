@@ -132,11 +132,53 @@ public class ScatterPlot {
          * @returns true if the point is inside the triangle
          */
         public boolean CheckBoundaries(Point point) {
-                if (points[1].pos[0] > lines[2].m * (points[1].pos[0]) + lines[2].b) {
+            double Ax = points[0].pos[0]; 
+            double Ay = points[0].pos[1]; 
 
-                } else {
-                    
+            double Bx = points[1].pos[0]; 
+            double By = points[1].pos[1]; 
+
+            double Cx = points[2].pos[0]; 
+            double Cy = points[2].pos[1]; 
+
+            Line AB = lines[0];
+            Line AC = lines[1];
+            Line BC = lines[2];
+
+            boolean Cstate =  Cy < ( (Ay - By) / (Ax - Bx) ) * (Cx - Ax) + Ay;
+
+            // TODO OPTIMIZE!! AND TEST!!!
+
+            if (Cstate) {
+                if (point.pos[1] < AB.m * (point.pos[0]) + AB.b)  {
+                    if (point.pos[1] > AC.m * (point.pos[0]) + AC.b) {
+                        if ((By - Cy) / (Bx - Cx) > 0) {
+                            if (point.pos[1] > BC.m * (point.pos[0]) + BC.b) {
+                                return true;
+                            }
+                        } else {
+                            if (point.pos[1] < BC.m * (point.pos[0]) + BC.b) {
+                                return true;
+                            }
+                        }
+                    }
                 }
+            } else {
+                if (point.pos[1] > AB.m * (point.pos[0]) + AB.b)  {
+                    if (point.pos[1] < AC.m * (point.pos[0]) + AC.b) {
+                        if ((By - Cy) / (Bx - Cx) > 0) {
+                            if (point.pos[1] < BC.m * (point.pos[0]) + BC.b) {
+                                return true;
+                            }
+                        } else {
+                            if (point.pos[1] > BC.m * (point.pos[0]) + BC.b) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
             return false;
         }
 
