@@ -8,6 +8,6 @@ public class Main {
             new Point(0,0), new Point(1, 1), new Point(2, 0)
         );
 
-        System.out.println(ScatterPlot.Triangle.CheckBoundaries(trigle, new Point(0.5, 0.5)));
+        System.out.println(trigle.CheckBoundaries(new Point(0.5, 0.5)));
     }
 }
