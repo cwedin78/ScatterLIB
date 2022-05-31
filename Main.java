@@ -1,17 +1,13 @@
 import src.ScatterPlot;
 import src.ScatterPlot.Point;
+import src.ScatterPlot.Triangle;
 
 public class Main {
     public static void main(String[] args) {
-        ScatterPlot plot = new ScatterPlot();
-        plot.AddPoints(
-             new Point(3, 5, 5)
-            ,new Point(1, 6, 5)
-            ,new Point(2, 4, 5)
-            ,new Point(2.2, 7, 5)
-            ,new Point(2.5, 3, 5)
-            ,new Point(4,4, 5)
+        Triangle trigle = new Triangle(
+            new Point(0,0), new Point(1, 1), new Point(2, 0)
         );
-        System.out.println(plot.Calculate(3.3,1));
+
+        System.out.println(ScatterPlot.Triangle.CheckBoundaries(trigle, new Point(0.5, 0.5)));
     }
 }

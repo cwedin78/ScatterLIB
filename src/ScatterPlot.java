@@ -131,47 +131,47 @@ public class ScatterPlot {
          * the boundaries of the triangle 
          * @returns true if the point is inside the triangle
          */
-        public boolean CheckBoundaries(Point point) {
-            double Ax = points[0].pos[0]; 
-            double Ay = points[0].pos[1]; 
+        public static boolean CheckBoundaries(Triangle Tri, Point point) {
+            double Ax = Tri.points[0].pos[0]; 
+            double Ay = Tri.points[0].pos[1]; 
 
-            double Bx = points[1].pos[0]; 
-            double By = points[1].pos[1]; 
+            double Bx = Tri.points[1].pos[0]; 
+            double By = Tri.points[1].pos[1]; 
 
-            double Cx = points[2].pos[0]; 
-            double Cy = points[2].pos[1]; 
+            double Cx = Tri.points[2].pos[0]; 
+            double Cy = Tri.points[2].pos[1]; 
 
-            Line AB = lines[0];
-            Line AC = lines[1];
-            Line BC = lines[2];
+            Line AB = Tri.lines[0];
+            Line AC = Tri.lines[1];
+            Line BC = Tri.lines[2];
 
             boolean Cstate =  Cy < ( (Ay - By) / (Ax - Bx) ) * (Cx - Ax) + Ay;
 
-            // TODO OPTIMIZE!! AND TEST!!!
+            // TODO OPTIMIZE!!
 
             if (Cstate) {
-                if (point.pos[1] < AB.m * (point.pos[0]) + AB.b)  {
-                    if (point.pos[1] > AC.m * (point.pos[0]) + AC.b) {
+                if (point.pos[1] <= AB.m * (point.pos[0]) + AB.b)  {
+                    if (point.pos[1] >= AC.m * (point.pos[0]) + AC.b) {
                         if ((By - Cy) / (Bx - Cx) > 0) {
-                            if (point.pos[1] > BC.m * (point.pos[0]) + BC.b) {
+                            if (point.pos[1] >= BC.m * (point.pos[0]) + BC.b) {
                                 return true;
                             }
                         } else {
-                            if (point.pos[1] < BC.m * (point.pos[0]) + BC.b) {
+                            if (point.pos[1] <= BC.m * (point.pos[0]) + BC.b) {
                                 return true;
                             }
                         }
                     }
                 }
             } else {
-                if (point.pos[1] > AB.m * (point.pos[0]) + AB.b)  {
-                    if (point.pos[1] < AC.m * (point.pos[0]) + AC.b) {
+                if (point.pos[1] >= AB.m * (point.pos[0]) + AB.b)  {
+                    if (point.pos[1] <= AC.m * (point.pos[0]) + AC.b) {
                         if ((By - Cy) / (Bx - Cx) > 0) {
-                            if (point.pos[1] < BC.m * (point.pos[0]) + BC.b) {
+                            if (point.pos[1] <= BC.m * (point.pos[0]) + BC.b) {
                                 return true;
                             }
                         } else {
-                            if (point.pos[1] > BC.m * (point.pos[0]) + BC.b) {
+                            if (point.pos[1] >= BC.m * (point.pos[0]) + BC.b) {
                                 return true;
                             }
                         }
