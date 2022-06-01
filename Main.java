@@ -8,6 +8,9 @@ public class Main {
             new Point(0,0), new Point(1, 1), new Point(2, 0)
         );
 
-        System.out.println(trigle.CheckBoundaries(new Point(0.5, 0.5)));
+        double y = 0.8;
+        for (int i = 0; i < 50; i++) {
+            System.out.println("Testing point at - (" + 0.1 * i + "," + y + ") - " + trigle.CheckBoundaries(new Point(0.1 * i, y)));
+        }
     }
 }

@@ -99,6 +99,14 @@ public class ScatterPlot {
 
             return null;
         }
+
+        /**
+         * Checks if a given point is over the line.
+         * @return true if point is over line.
+         */
+        public boolean CheckOver(Point point) {
+            return (point.pos[1] >= m * point.pos[0] + b);
+        }
     }
 
     /*
@@ -112,17 +120,6 @@ public class ScatterPlot {
         //                      AB   AC   BC
         public Line[] lines = {null,null,null};
 
-        public double Ax = points[0].pos[0]; 
-        public double Ay = points[0].pos[1]; 
-        public double Bx = points[1].pos[0]; 
-        public double By = points[1].pos[1]; 
-        public double Cx = points[2].pos[0]; 
-        public double Cy = points[2].pos[1]; 
-
-        public Line AB = lines[0];
-        public Line AC = lines[1];
-        public Line BC = lines[2];
-
         /*
          * Creates a new triangle with defined points,
          * and assumed lines
@@ -132,9 +129,9 @@ public class ScatterPlot {
          */
         public Triangle(Point A, Point B, Point C) {
             points = ScatterPlot.PointSort(A,B,C);
-            lines[0] = new Line(points[0], points[1]);
-            lines[1] = new Line(points[0], points[2]);
-            lines[2] = new Line(points[1], points[2]);
+            lines[0] = new Line(points[0], points[2]);
+            lines[1] = new Line(points[0], points[1]);
+            lines[2] = new Line(points[2], points[1]);
         }
 
         /*
@@ -144,41 +141,21 @@ public class ScatterPlot {
          */
         public boolean CheckBoundaries(Point point) {
 
-            boolean Cstate =  Cy < ( (Ay - By) / (Ax - Bx) ) * (Cx - Ax) + Ay;
+            double Ax = points[0].pos[0]; double Ay = points[0].pos[1]; 
+            double Bx = points[2].pos[0]; double By = points[2].pos[1]; 
+            double Cx = points[1].pos[0]; double Cy = points[1].pos[1]; 
+            Line AB = lines[0]; Line AC = lines[1]; Line BC = lines[2];
+            boolean Cstate =  Cy > ( (Ay - By) / (Ax - Bx) ) * (Cx - Ax) + Ay; // true if C is over A and B
 
-            // TODO OPTIMIZE!!
+            // TODO TEST!!!!!
 
             if (Cstate) {
-                if (point.pos[1] <= AB.m * (point.pos[0]) + AB.b)  {
-                    if (point.pos[1] >= AC.m * (point.pos[0]) + AC.b) {
-                        if ((By - Cy) / (Bx - Cx) > 0) {
-                            if (point.pos[1] >= BC.m * (point.pos[0]) + BC.b) {
-                                return true;
-                            }
-                        } else {
-                            if (point.pos[1] <= BC.m * (point.pos[0]) + BC.b) {
-                                return true;
-                            }
-                        }
-                    }
-                }
+                return (AB.CheckOver(point) && !AC.CheckOver(point) && !BC.CheckOver(point));
+                // Over AB, under AC, BC
             } else {
-                if (point.pos[1] >= AB.m * (point.pos[0]) + AB.b)  {
-                    if (point.pos[1] <= AC.m * (point.pos[0]) + AC.b) {
-                        if ((By - Cy) / (Bx - Cx) > 0) {
-                            if (point.pos[1] <= BC.m * (point.pos[0]) + BC.b) {
-                                return true;
-                            }
-                        } else {
-                            if (point.pos[1] >= BC.m * (point.pos[0]) + BC.b) {
-                                return true;
-                            }
-                        }
-                    }
-                }
+                // Under AB, Over AC, BC
+                return (!AB.CheckOver(point) && AC.CheckOver(point) && BC.CheckOver(point));
             }
-
-            return false;
         }
 
         
