@@ -11,7 +11,7 @@ public class ScatterPlot {
      * Used to represent a point for the scatterplot lib
      */
     public static class Point {
-        public double[] pos;
+        public double[] p;
         public final int dim;
         /*
          * Creates a new point in the dimension equal to the
@@ -19,7 +19,7 @@ public class ScatterPlot {
          * @param vals X, Y, Z... coords
          */
         public Point(double... vals) {
-            pos = vals;
+            p = vals;
             dim = vals.length;
         }
     }
@@ -48,8 +48,8 @@ public class ScatterPlot {
          */
         public Line set(Point A, Point B) {
             points = ScatterPlot.PointSort(A,B);
-            m = (A.pos[1] - B.pos[1]) / (A.pos[0] - B.pos[0]);
-            b = m * (-A.pos[0]) + A.pos[1];
+            m = (A.p[1] - B.p[1]) / (A.p[0] - B.p[0]);
+            b = m * (-A.p[0]) + A.p[1];
 
             return this;
         }
@@ -66,17 +66,17 @@ public class ScatterPlot {
         public static boolean CheckCollision(Line A, Line B, double Tol) {
             if (A.m == B.m) { // Divide by 0 catch
                 return ( 
-                    (A.m * (A.points[0].pos[0]) + A.points[0].pos[1]) != 
-                    (B.m * (B.points[0].pos[0]) + B.points[0].pos[1])
+                    (A.m * (A.points[0].p[0]) + A.points[0].p[1]) != 
+                    (B.m * (B.points[0].p[0]) + B.points[0].p[1])
                 );
             } else {
                 return (
                     (
-                        (A.b - B.b) / (B.m - A.m) <= (A.points[0].pos[0] + Tol) || 
-                        (A.b - B.b) / (B.m - A.m) <= (B.points[0].pos[0] + Tol)
+                        (A.b - B.b) / (B.m - A.m) <= (A.points[0].p[0] + Tol) || 
+                        (A.b - B.b) / (B.m - A.m) <= (B.points[0].p[0] + Tol)
                     ) || (
-                        (A.b - B.b) / (B.m - A.m) >= (A.points[1].pos[0] - Tol) || 
-                        (A.b - B.b) / (B.m - A.m) >= (B.points[1].pos[0] - Tol)
+                        (A.b - B.b) / (B.m - A.m) >= (A.points[1].p[0] - Tol) || 
+                        (A.b - B.b) / (B.m - A.m) >= (B.points[1].p[0] - Tol)
                     )
                 );
             }
@@ -105,7 +105,7 @@ public class ScatterPlot {
          * @return true if point is over line.
          */
         public boolean CheckOver(Point point) {
-            return (point.pos[1] >= m * point.pos[0] + b);
+            return (point.p[1] >= m * point.p[0] + b);
         }
     }
 
@@ -141,9 +141,9 @@ public class ScatterPlot {
          */
         public boolean CheckBoundaries(Point point) {
 
-            double Ax = points[0].pos[0]; double Ay = points[0].pos[1]; 
-            double Bx = points[2].pos[0]; double By = points[2].pos[1]; 
-            double Cx = points[1].pos[0]; double Cy = points[1].pos[1]; 
+            double Ax = points[0].p[0]; double Ay = points[0].p[1]; 
+            double Bx = points[2].p[0]; double By = points[2].p[1]; 
+            double Cx = points[1].p[0]; double Cy = points[1].p[1]; 
             Line AB = lines[0]; Line AC = lines[1]; Line BC = lines[2];
             boolean Cstate =  Cy > ( (Ay - By) / (Ax - Bx) ) * (Cx - Ax) + Ay; // true if C is over A and B
 
@@ -192,7 +192,7 @@ public class ScatterPlot {
     public static Point[] PointSort(Point... pointArr) {
         for(double j=0; j<pointArr.length-1; j++){
             for(int i=0; i<pointArr.length-1; i++){
-                if (pointArr[i].pos[0] > pointArr[i+1].pos[0]){
+                if (pointArr[i].p[0] > pointArr[i+1].p[0]){
                     Point temp = pointArr[i+1];
                     pointArr[i+1] = pointArr[i];
                     pointArr[i] = temp;
@@ -205,7 +205,7 @@ public class ScatterPlot {
 
     /*
      * Assumes an output based upon given data
-     * at the given position
+     * at the given pition
      * @param inp Input coordinated to assume an output at,
      * if too many are given, only needed items are taken.
      * @return double of assumed calculation
@@ -245,9 +245,9 @@ public class ScatterPlot {
          * line it will be removed.
          */
         for (Point n : par) {
-            System.out.println("n - (" + n.pos[0] + "," + n.pos[1] + ")");
+            System.out.println("n - (" + n.p[0] + "," + n.p[1] + ")");
             for (Point n2 : par) {
-                System.out.println("n2 - (" + n2.pos[0] + "," + n2.pos[1] + ")");
+                System.out.println("n2 - (" + n2.p[0] + "," + n2.p[1] + ")");
                 if (n != n2) {
                     Line temp = new Line(n, n2);
                     boolean allow = true;
@@ -305,9 +305,9 @@ public class ScatterPlot {
                                     for (Triangle tri : triangles.toArray(new Triangle[0])) {
                                         if (
                                             (
-                                                t.points[0].pos == tri.points[0].pos &&
-                                                t.points[1].pos == tri.points[1].pos &&
-                                                t.points[2].pos == tri.points[2].pos
+                                                t.points[0].p == tri.points[0].p &&
+                                                t.points[1].p == tri.points[1].p &&
+                                                t.points[2].p == tri.points[2].p
                                             )
                                         ) {
                                             allow = false;
@@ -317,9 +317,9 @@ public class ScatterPlot {
                                     if (allow) {
                                         triangles.add(t);
                                         System.out.println("Created new triangle via - (" +
-                                        t.points[0].pos[0] + "," + t.points[0].pos[1] + ") (" +
-                                        t.points[1].pos[0] + "," + t.points[1].pos[1] + ") (" +
-                                        t.points[2].pos[0] + "," + t.points[2].pos[1] + ")");
+                                        t.points[0].p[0] + "," + t.points[0].p[1] + ") (" +
+                                        t.points[1].p[0] + "," + t.points[1].p[1] + ") (" +
+                                        t.points[2].p[0] + "," + t.points[2].p[1] + ")");
                                     }
                                 }
                             }
@@ -348,11 +348,11 @@ public class ScatterPlot {
         double avSlope = (totSlope / lines.toArray().length);
 
         Line[] ls = lines.toArray(new Line[0]);
-        double baseReturn = avSlope * (x - ls[0].points[0].pos[0]) + ls[0].points[0].pos[1];
+        double baseReturn = avSlope * (x - ls[0].points[0].p[0]) + ls[0].points[0].p[1];
 
         for (Line l : lines.toArray(new Line[0])) {
-            if (x >= l.points[0].pos[0] && (x < l.points[1].pos[0])) {
-                return l.m * (x - l.points[0].pos[0]) + l.points[0].pos[1];
+            if (x >= l.points[0].p[0] && (x < l.points[1].p[0])) {
+                return l.m * (x - l.points[0].p[0]) + l.points[0].p[1];
             }
         }
 
