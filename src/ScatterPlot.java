@@ -302,6 +302,17 @@ public class ScatterPlot {
                                     Triangle t = new Triangle(AB, AC, BC);
 
                                     boolean allow = true;
+                                    for (Point p : par) {
+                                        boolean use = true;
+                                        for (Point p2 : t.points) {
+                                            if (p == p2) {
+                                                use = false;
+                                            }
+                                        }
+
+                                        if (t.CheckBoundaries(p) && use) {allow = false;}
+                                    }
+
                                     for (Triangle tri : triangles.toArray(new Triangle[0])) {
                                         if (
                                             (

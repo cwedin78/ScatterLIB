@@ -4,13 +4,15 @@ import src.ScatterPlot.Triangle;
 
 public class Main {
     public static void main(String[] args) {
-        Triangle trigle = new Triangle(
-            new Point(0,0), new Point(1, 1), new Point(2, 0)
+        ScatterPlot plot = new ScatterPlot(
+            new Point(0,1),
+            new Point(1,2),
+            new Point(2,0),
+            new Point(3,4),
+            new Point(4,3),
+            new Point(0.5,4)
         );
 
-        double y = 0.8;
-        for (int i = 0; i < 50; i++) {
-            System.out.println("Testing point at - (" + 0.1 * i + "," + y + ") - " + trigle.CheckBoundaries(new Point(0.1 * i, y)));
-        }
+        plot.Calculate(0,0);
     }
 }
