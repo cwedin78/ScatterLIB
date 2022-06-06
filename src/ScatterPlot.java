@@ -6,6 +6,7 @@ import java.util.List;
 public class ScatterPlot {
 
     List<Point> points = new ArrayList<Point>();
+    List<Triangle> Trimesh = new ArrayList<Triangle>();
 
     /*
      * Used to represent a point for the scatterplot lib
@@ -168,6 +169,8 @@ public class ScatterPlot {
      */
     public ScatterPlot(Point... Points) {
         for (Point p : PointSort(Points)) {points.add(p);}
+
+        if (Points[0].p.length > 2) {CalcTrimesh();}
     }
 
 
@@ -181,6 +184,8 @@ public class ScatterPlot {
         Point[] par = PointSort(points.toArray(new Point[0]));
         points.clear();
         for (Point p : par) {points.add(p);}
+
+        if (Points[0].p.length > 2) {CalcTrimesh();}
     }
 
     /*
@@ -225,6 +230,53 @@ public class ScatterPlot {
     }
 
     double seq3d(double x, double y) {
+        for (Triangle t : Trimesh) {
+            if (t.CheckBoundaries(new Point(x,y))) {
+                double a = (t.points[1].p[1] - t.points[0].p[1]) *  (t.points[2].p[2] - t.points[0].p[2]) - 
+                           (t.points[2].p[1] - t.points[1].p[1]) *  (t.points[2].p[2] - t.points[1].p[2]);
+
+                double b = (t.points[2].p[0] - t.points[0].p[0]) *  (t.points[1].p[2] - t.points[0].p[2]) - 
+                           (t.points[1].p[0] - t.points[0].p[0]) *  (t.points[2].p[2] - t.points[0].p[2]);
+
+                double c = (t.points[1].p[0] - t.points[0].p[0]) *  (t.points[2].p[1] - t.points[0].p[1]) - 
+                           (t.points[3].p[1] - t.points[0].p[1]) *  (t.points[2].p[0] - t.points[0].p[0]);
+                
+                double d = (-a*(t.points[0].p[0]) - b*(t.points[0].p[1]) - c*(t.points[0].p[2]));
+
+                return ((a * x) + (b * y) + d) / -c;
+            }
+        }
+        
+        return 0;
+    }
+
+    double seq2d(double x) {
+        List<Line> lines = new ArrayList<Line>();
+        Point[] par = (Point[]) points.toArray(new Point[0]);
+
+        // Term 1, parsing through points from lowest 
+        // x to highest x and drawing lines between
+        for (int i = 0; i < par.length - 1; i++) {
+            lines.add(new Line(par[i], par[i+1]));
+        }
+
+        double totSlope = 0;
+        for (Line l : lines.toArray(new Line[0])) {totSlope += l.m;}
+        double avSlope = (totSlope / lines.toArray().length);
+
+        Line[] ls = lines.toArray(new Line[0]);
+        double baseReturn = avSlope * (x - ls[0].points[0].p[0]) + ls[0].points[0].p[1];
+
+        for (Line l : lines.toArray(new Line[0])) {
+            if (x >= l.points[0].p[0] && (x < l.points[1].p[0])) {
+                return l.m * (x - l.points[0].p[0]) + l.points[0].p[1];
+            }
+        }
+
+        return baseReturn;
+    }
+
+    void CalcTrimesh() {
         List<Line> lines = new ArrayList<Line>();
         List<Triangle> triangles = new ArrayList<Triangle>();
         Point[] par = points.toArray(new Point[0]);
@@ -253,7 +305,7 @@ public class ScatterPlot {
                     boolean allow = true;
 
                     for (Line l : lines.toArray(new Line[0])) {
-                        if (!Line.CheckCollision(l, temp, 0.001)) {
+                        if (!Line.CheckCollision(l, temp, 0)) {
                             allow = false;
                             System.out.println("y = " + temp.m + "x + " + temp.b + " - failed");
                         }
@@ -278,14 +330,6 @@ public class ScatterPlot {
          *  line A must share a point with line B, line C must not share
          *  the same point like A and B share, and line C must share a point
          *  with line A and line B.
-         * 
-         * TODO BUG: a triangle can be created when a point is inside it:
-         *         Created new triangle via - (1.0,6.0) (2.0,4.0) (2.2,7.0)
-         *         Created new triangle via - (2.0,4.0) (2.2,7.0) (2.5,3.0)
-         *         Created new triangle via - (2.2,7.0) (2.5,3.0) (3.0,5.0)
-         *         Created new triangle via - (2.2,7.0) (2.5,3.0) (4.0,4.0)
-         *         Created new triangle via - (2.5,3.0) (3.0,5.0) (4.0,4.0)
-         *         Created new triangle via - (2.2,7.0) (3.0,5.0) (4.0,4.0)
          */
         for (Line A : lines.toArray(new Line[0])) {
             for (Line B : lines.toArray(new Line[0])) {
@@ -340,33 +384,6 @@ public class ScatterPlot {
             } 
         }
 
-
-        return 0;
-    }
-
-    double seq2d(double x) {
-        List<Line> lines = new ArrayList<Line>();
-        Point[] par = (Point[]) points.toArray(new Point[0]);
-
-        // Term 1, parsing through points from lowest 
-        // x to highest x and drawing lines between
-        for (int i = 0; i < par.length - 1; i++) {
-            lines.add(new Line(par[i], par[i+1]));
-        }
-
-        double totSlope = 0;
-        for (Line l : lines.toArray(new Line[0])) {totSlope += l.m;}
-        double avSlope = (totSlope / lines.toArray().length);
-
-        Line[] ls = lines.toArray(new Line[0]);
-        double baseReturn = avSlope * (x - ls[0].points[0].p[0]) + ls[0].points[0].p[1];
-
-        for (Line l : lines.toArray(new Line[0])) {
-            if (x >= l.points[0].p[0] && (x < l.points[1].p[0])) {
-                return l.m * (x - l.points[0].p[0]) + l.points[0].p[1];
-            }
-        }
-
-        return baseReturn;
+        Trimesh = triangles;
     }
 }
