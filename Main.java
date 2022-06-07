@@ -13,6 +13,6 @@ public class Main {
             new Point(0.5,4,7)
         );
 
-        System.out.println(plot.Calculate(0.5,1));
+        System.out.println(plot.Calculate(1,1));
     }
 }

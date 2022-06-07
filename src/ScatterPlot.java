@@ -232,17 +232,20 @@ public class ScatterPlot {
     double seq3d(double x, double y) {
         for (Triangle t : Trimesh) {
             if (t.CheckBoundaries(new Point(x,y))) {
-                double a = (t.points[1].p[1] - t.points[0].p[1]) *  (t.points[2].p[2] - t.points[0].p[2]) - 
-                           (t.points[2].p[1] - t.points[1].p[1]) *  (t.points[2].p[2] - t.points[1].p[2]);
 
-                double b = (t.points[2].p[0] - t.points[0].p[0]) *  (t.points[1].p[2] - t.points[0].p[2]) - 
-                           (t.points[1].p[0] - t.points[0].p[0]) *  (t.points[2].p[2] - t.points[0].p[2]);
+                double x1 = t.points[0].p[0]; double x2 = t.points[1].p[0]; double x3 = t.points[2].p[0];
+                double y1 = t.points[0].p[1]; double y2 = t.points[1].p[1]; double y3 = t.points[2].p[1];
+                double z1 = t.points[0].p[2]; double z2 = t.points[1].p[2]; double z3 = t.points[2].p[2];
 
-                double c = (t.points[1].p[0] - t.points[0].p[0]) *  (t.points[2].p[1] - t.points[0].p[1]) - 
-                           (t.points[3].p[1] - t.points[0].p[1]) *  (t.points[2].p[0] - t.points[0].p[0]);
-                
-                double d = (-a*(t.points[0].p[0]) - b*(t.points[0].p[1]) - c*(t.points[0].p[2]));
+                double a = (y2 - y1) * (z3 - z1) - (y3 - y1) * (z2 - z1);
+                double b = (x3 - x1) * (z2 - z1) - (y2 - y1) * (z3 - z1);
+                double c = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+                double d = (-(a * x1) - (b * y1) - (c * z1));
 
+                System.out.println("Returning triangle: " +
+                    "(" + t.points[0].p[0] + "," + t.points[0].p[1] + "," + t.points[0].p[2] + ")" +
+                    "(" + t.points[1].p[0] + "," + t.points[1].p[1] + "," + t.points[1].p[2] + ")" +
+                    "(" + t.points[2].p[0] + "," + t.points[2].p[1] + "," + t.points[2].p[2] + ")");
                 return ((a * x) + (b * y) + d) / -c;
             }
         }
