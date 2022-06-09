@@ -9,6 +9,8 @@ public class ScatterPlot {
     List<Point> points = new ArrayList<Point>();
     List<Triangle> Trimesh = new ArrayList<Triangle>();
 
+    public int TrimeshSpeed = 0;
+
     /*
      * Used to represent a point for the scatterplot lib
      */
@@ -106,8 +108,9 @@ public class ScatterPlot {
          * Checks if a given point is over the line.
          * @return true if point is over line.
          */
-        public boolean CheckOver(Point point, double tol) {
-            return (point.p[1] + tol >= m * point.p[0] + b);
+        public boolean CheckOver(Point point, boolean AllowLine) {
+            if (AllowLine && point.p[1] == m * (point.p[0]) + b) {return true;} 
+            return (point.p[1] >= m * point.p[0] + b);
         }
     }
 
@@ -160,11 +163,17 @@ public class ScatterPlot {
             // TODO TEST!!!!!
 
             if (Cstate) {
-                return (AB.CheckOver(point,tol) && !AC.CheckOver(point,tol) && !BC.CheckOver(point,tol));
+                return (
+                    AB.CheckOver(point, true) && 
+                    !AC.CheckOver(point,true) && 
+                    !BC.CheckOver(point,true));
                 // Over AB, under AC, BC
             } else {
                 // Under AB, Over AC, BC
-                return (!AB.CheckOver(point,tol) && AC.CheckOver(point,tol) && BC.CheckOver(point,tol));
+                return (
+                    !AB.CheckOver(point,true) 
+                    && AC.CheckOver(point,true) 
+                    && BC.CheckOver(point,true));
             }
         }
 
@@ -335,6 +344,7 @@ public class ScatterPlot {
                     for (Line l : lines.toArray(new Line[0])) {
                         if (!Line.CheckCollision(l, temp, 0.01)) {
                             allow = false;
+                            break;
                         }
                     }
 
@@ -370,24 +380,27 @@ public class ScatterPlot {
                                     boolean allow = true;
                                     for (Point p : par) {
                                         boolean use = true;
-                                        for (Point p2 : t.points) {
-                                            if (p == p2) {
+                                       for (Point p2 : t.points) {
+                                             if (p == p2) {
                                                 use = false;
+                                                break;
                                             }
                                         }
 
-                                        if (t.CheckBoundaries(p, 0) && use) {allow = false;}
+                                        if (t.CheckBoundaries(p, 0) && use) {
+                                            allow = false;
+                                            break;
+                                        }
                                     }
 
                                     for (Triangle tri : triangles.toArray(new Triangle[0])) {
                                         if (
-                                            (
-                                                t.points[0].p == tri.points[0].p &&
-                                                t.points[1].p == tri.points[1].p &&
-                                                t.points[2].p == tri.points[2].p
-                                            )
+                                            t.points[0].p == tri.points[0].p &&
+                                            t.points[1].p == tri.points[1].p &&
+                                            t.points[2].p == tri.points[2].p
                                         ) {
                                             allow = false;
+                                            break;
                                         }
                                     }
 
@@ -404,11 +417,12 @@ public class ScatterPlot {
 
         Trimesh = triangles;
 
-        System.out.println("Created " + triangles.toArray().length + " triangles");
-        System.out.println("From " + lines.toArray().length + " lines");
+        //System.out.println("Created " + triangles.toArray().length + " triangles");
+        //System.out.println("From " + lines.toArray().length + " lines");
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-        System.out.println("Calculated trimesh in: " + duration + " ns (about " + duration/1000000 + " ms)");
+        TrimeshSpeed = (int) duration/1000000;
+        //System.out.println("Calculated trimesh in: " + duration + " ns (about " + duration/1000000 + " ms)");
     }
 }

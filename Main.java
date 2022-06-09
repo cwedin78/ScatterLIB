@@ -11,24 +11,34 @@ import src.ScatterPlot.Triangle;
 
 public class Main {
     public static void main(String[] args) {
-        List<Point> toAdd = new ArrayList<Point>();
+        int sample = 1;
+        int[] speeds = new int[sample];
+        for (int s = 0; s < sample; s++) {
+            List<Point> toAdd = new ArrayList<Point>();
 
-        int N = 1000;
-        int a = 0;
-        int b = N * 3;
+            int N = 450;
+            int a = 0;
+            int b = N * 3;
 
-        Random random = new Random();
-        List<Integer> randInt = random.ints(a, b).distinct().limit(N * 3).boxed().collect(Collectors.toList());
+            Random random = new Random();
+            List<Integer> randInt = random.ints(a, b).distinct().limit(N * 3).boxed().collect(Collectors.toList());
 
-        for (int i = 0; i <= (N*3)-3 ; i += 3 ) {
-            toAdd.add(new Point(randInt.toArray(new Integer[0])[i], randInt.toArray(new Integer[0])[i + 1], randInt.toArray(new Integer[0])[i + 2]));
+            for (int i = 0; i <= (N*3)-3 ; i += 3 ) {
+                toAdd.add(new Point(randInt.toArray(new Integer[0])[i], randInt.toArray(new Integer[0])[i + 1], randInt.toArray(new Integer[0])[i + 2]));
+            }
+             
+            ScatterPlot plot = new ScatterPlot(toAdd.toArray(new Point[0]));
+            speeds[s] = plot.TrimeshSpeed;
         }
-        
 
-        System.out.println("Using " + toAdd.toArray().length + " points");
+        Arrays.sort(speeds);
 
-        ScatterPlot plot = new ScatterPlot(toAdd.toArray(new Point[0]));
+        int total = 0;
+        for (int i : speeds) {
+            System.out.print(i + ", ");
+            total += i;
+        }
 
-        System.out.println(plot.Calculate(50,50));
+        System.out.println("Mean = " + total/sample);
     }
 }
