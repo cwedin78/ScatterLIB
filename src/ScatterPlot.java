@@ -1,6 +1,7 @@
 package src;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ScatterPlot {
@@ -105,8 +106,8 @@ public class ScatterPlot {
          * Checks if a given point is over the line.
          * @return true if point is over line.
          */
-        public boolean CheckOver(Point point) {
-            return (point.p[1] >= m * point.p[0] + b);
+        public boolean CheckOver(Point point, double tol) {
+            return (point.p[1] + tol >= m * point.p[0] + b);
         }
     }
 
@@ -121,6 +122,10 @@ public class ScatterPlot {
         //                      AB   AC   BC
         public Line[] lines = {null,null,null};
 
+        public double x1, x2, x3;
+        public double y1, y2, y3;
+        public double z1, z2, z3;
+
         /*
          * Creates a new triangle with defined points,
          * and assumed lines
@@ -133,6 +138,10 @@ public class ScatterPlot {
             lines[0] = new Line(points[0], points[2]);
             lines[1] = new Line(points[0], points[1]);
             lines[2] = new Line(points[2], points[1]);
+
+            x1 = points[0].p[0]; x2 = points[1].p[0]; x3 = points[2].p[0];
+            y1 = points[0].p[1]; y2 = points[1].p[1]; y3 = points[2].p[1];
+            z1 = points[0].p[2]; z2 = points[1].p[2]; z3 = points[2].p[2];
         }
 
         /*
@@ -140,7 +149,7 @@ public class ScatterPlot {
          * the boundaries of the triangle 
          * @returns true if the point is inside the triangle
          */
-        public boolean CheckBoundaries(Point point) {
+        public boolean CheckBoundaries(Point point, double tol) {
 
             double Ax = points[0].p[0]; double Ay = points[0].p[1]; 
             double Bx = points[2].p[0]; double By = points[2].p[1]; 
@@ -151,11 +160,11 @@ public class ScatterPlot {
             // TODO TEST!!!!!
 
             if (Cstate) {
-                return (AB.CheckOver(point) && !AC.CheckOver(point) && !BC.CheckOver(point));
+                return (AB.CheckOver(point,tol) && !AC.CheckOver(point,tol) && !BC.CheckOver(point,tol));
                 // Over AB, under AC, BC
             } else {
                 // Under AB, Over AC, BC
-                return (!AB.CheckOver(point) && AC.CheckOver(point) && BC.CheckOver(point));
+                return (!AB.CheckOver(point,tol) && AC.CheckOver(point,tol) && BC.CheckOver(point,tol));
             }
         }
 
@@ -170,7 +179,7 @@ public class ScatterPlot {
     public ScatterPlot(Point... Points) {
         for (Point p : PointSort(Points)) {points.add(p);}
 
-        if (Points[0].p.length > 2) {CalcTrimesh();}
+        if (Points.length > 0 && Points[0].p.length > 2) {CalcTrimesh();}
     }
 
 
@@ -181,11 +190,10 @@ public class ScatterPlot {
      */
     public void AddPoints(Point... Points) {
         for (Point p : Points) {points.add(p);}
-        Point[] par = PointSort(points.toArray(new Point[0]));
-        points.clear();
-        for (Point p : par) {points.add(p);}
 
-        if (Points[0].p.length > 2) {CalcTrimesh();}
+        points = Arrays.asList(PointSort(points.toArray(new Point[0])));
+
+        if (Points.length > 0 && Points[0].p.length > 2) {CalcTrimesh();}
     }
 
     /*
@@ -216,39 +224,56 @@ public class ScatterPlot {
      * @return double of assumed calculation
      */
     public double Calculate(double... inp) {
+        long startTime = System.nanoTime();
+        double out = 0;
 
         switch (inp.length) {
             case 1:
-                return seq2d(inp[0]);
+                out = seq2d(inp[0]);
             
             case 2:
-                return seq3d(inp[0], inp[1]);
+                out = seq3d(inp[0], inp[1]);
         
             default:
-                return 0;
+                ;
         }
+
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println("Calculated output in: " + duration + " ns (about " + duration/1000000 + " ms)");
+
+        return out;
     }
 
     double seq3d(double x, double y) {
+        long startTime = System.nanoTime();
         for (Triangle t : Trimesh) {
-            if (t.CheckBoundaries(new Point(x,y))) {
+            if (t.CheckBoundaries(new Point(x,y), 0.1)) {
+                
+                System.out.println("Using points (" + t.x1 + "," + t.y1 + "," + t.z1 + ") ("+ t.x2 + "," + t.y2 + "," + t.z2 + ") ("+ t.x3 + "," + t.y3 + "," + t.z3 + ")");
 
-                double x1 = t.points[0].p[0]; double x2 = t.points[1].p[0]; double x3 = t.points[2].p[0];
-                double y1 = t.points[0].p[1]; double y2 = t.points[1].p[1]; double y3 = t.points[2].p[1];
-                double z1 = t.points[0].p[2]; double z2 = t.points[1].p[2]; double z3 = t.points[2].p[2];
+                double a1 = t.x2 - t.x1;
+                double b1 = t.y2 - t.y1;
+                double c1 = t.z2 - t.z1;
+                double a2 = t.x3 - t.x1;
+                double b2 = t.y3 - t.y1;
+                double c2 = t.z3 - t.z1;
+                double a = b1 * c2 - b2 * c1;
+                double b = a2 * c1 - a1 * c2;
+                double c = a1 * b2 - b1 * a2;
+                double d = (- a * t.x1 - b * t.y1 - c * t.z1);
 
-                double a = (y2 - y1) * (z3 - z1) - (y3 - y1) * (z2 - z1);
-                double b = (x3 - x1) * (z2 - z1) - (y2 - y1) * (z3 - z1);
-                double c = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
-                double d = (-(a * x1) - (b * y1) - (c * z1));
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+                System.out.println("Parsed for contained triangle in: " + duration + " ns (about " + duration/1000000 + " ms)");
 
-                System.out.println("Returning triangle: " +
-                    "(" + t.points[0].p[0] + "," + t.points[0].p[1] + "," + t.points[0].p[2] + ")" +
-                    "(" + t.points[1].p[0] + "," + t.points[1].p[1] + "," + t.points[1].p[2] + ")" +
-                    "(" + t.points[2].p[0] + "," + t.points[2].p[1] + "," + t.points[2].p[2] + ")");
                 return ((a * x) + (b * y) + d) / -c;
             }
         }
+
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println("Failed to parse for contained triangle in: " + duration + " ns (about " + duration/1000000 + " ms)");
         
         return 0;
     }
@@ -280,6 +305,8 @@ public class ScatterPlot {
     }
 
     void CalcTrimesh() {
+        long startTime = System.nanoTime();
+
         List<Line> lines = new ArrayList<Line>();
         List<Triangle> triangles = new ArrayList<Triangle>();
         Point[] par = points.toArray(new Point[0]);
@@ -300,30 +327,22 @@ public class ScatterPlot {
          * line it will be removed.
          */
         for (Point n : par) {
-            System.out.println("n - (" + n.p[0] + "," + n.p[1] + ")");
             for (Point n2 : par) {
-                System.out.println("n2 - (" + n2.p[0] + "," + n2.p[1] + ")");
                 if (n != n2) {
                     Line temp = new Line(n, n2);
                     boolean allow = true;
 
                     for (Line l : lines.toArray(new Line[0])) {
-                        if (!Line.CheckCollision(l, temp, 0)) {
+                        if (!Line.CheckCollision(l, temp, 0.01)) {
                             allow = false;
-                            System.out.println("y = " + temp.m + "x + " + temp.b + " - failed");
                         }
                     }
 
                     if (allow) {
                         lines.add(temp);
-                        System.out.println("y = " + temp.m + "x + " + temp.b + " - success");
                     }
                 }
             }
-        }
-
-        for (Line l : lines.toArray(new Line[0])) {
-            System.out.println("y = " + l.m + "x + " + l.b);
         }
 
         /*
@@ -357,7 +376,7 @@ public class ScatterPlot {
                                             }
                                         }
 
-                                        if (t.CheckBoundaries(p) && use) {allow = false;}
+                                        if (t.CheckBoundaries(p, 0) && use) {allow = false;}
                                     }
 
                                     for (Triangle tri : triangles.toArray(new Triangle[0])) {
@@ -374,10 +393,6 @@ public class ScatterPlot {
 
                                     if (allow) {
                                         triangles.add(t);
-                                        System.out.println("Created new triangle via - (" +
-                                        t.points[0].p[0] + "," + t.points[0].p[1] + ") (" +
-                                        t.points[1].p[0] + "," + t.points[1].p[1] + ") (" +
-                                        t.points[2].p[0] + "," + t.points[2].p[1] + ")");
                                     }
                                 }
                             }
@@ -388,5 +403,12 @@ public class ScatterPlot {
         }
 
         Trimesh = triangles;
+
+        System.out.println("Created " + triangles.toArray().length + " triangles");
+        System.out.println("From " + lines.toArray().length + " lines");
+
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        System.out.println("Calculated trimesh in: " + duration + " ns (about " + duration/1000000 + " ms)");
     }
 }
