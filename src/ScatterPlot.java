@@ -107,6 +107,8 @@ public class ScatterPlot {
         /**
          * Checks if a given point is over the line.
          * @return true if point is over line.
+         * @param point The given point to check
+         * @param AllowLine If return true when the point is coincedent with the line
          */
         public boolean CheckOver(Point point, boolean AllowLine) {
             if (AllowLine && point.p[1] == m * (point.p[0]) + b) {return true;} 
@@ -417,12 +419,12 @@ public class ScatterPlot {
 
         Trimesh = triangles;
 
-        //System.out.println("Created " + triangles.toArray().length + " triangles");
-        //System.out.println("From " + lines.toArray().length + " lines");
+        System.out.println("Created " + triangles.toArray().length + " triangles");
+        System.out.println("From " + lines.toArray().length + " lines");
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
         TrimeshSpeed = (int) duration/1000000;
-        //System.out.println("Calculated trimesh in: " + duration + " ns (about " + duration/1000000 + " ms)");
+        System.out.println("Calculated trimesh in: " + duration + " ns (about " + duration/1000000 + " ms)");
     }
 }

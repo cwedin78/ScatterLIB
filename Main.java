@@ -11,12 +11,12 @@ import src.ScatterPlot.Triangle;
 
 public class Main {
     public static void main(String[] args) {
-        int sample = 1;
+        int sample = 100;
         int[] speeds = new int[sample];
         for (int s = 0; s < sample; s++) {
             List<Point> toAdd = new ArrayList<Point>();
 
-            int N = 450;
+            int N = 200;
             int a = 0;
             int b = N * 3;
 
