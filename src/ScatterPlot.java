@@ -207,15 +207,10 @@ public class ScatterPlot {
             Scanner scanner = new Scanner(PointFile);
             scanner.useDelimiter("[,|]");
             while (scanner.hasNextFloat()) {
-                double x = scanner.nextFloat();
-                double y = scanner.nextFloat();
-                double z = scanner.nextFloat();
-                System.out.println(x + "," + y + "," + z);
 
-                temp.add(new Point(x,y,z));
+                temp.add(new Point(scanner.nextFloat(),scanner.nextFloat(),scanner.nextFloat()));
             }
             scanner.close();
-            System.out.println("All doubles parsed");
         } catch (FileNotFoundException e) {e.printStackTrace(); System.out.println("File not accesable");}
         for(Point p : PointSort(temp.toArray(new Point[0]))) {points.add(p);}
 
