@@ -1,8 +1,11 @@
 package src;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class ScatterPlot {
 
@@ -11,13 +14,13 @@ public class ScatterPlot {
 
     public int TrimeshSpeed = 0;
 
-    /*
+    /**
      * Used to represent a point for the scatterplot lib
      */
     public static class Point {
         public double[] p;
         public final int dim;
-        /*
+        /**
          * Creates a new point in the dimension equal to the
          * number of values given
          * @param vals X, Y, Z... coords
@@ -28,7 +31,7 @@ public class ScatterPlot {
         }
     }
 
-    /*
+    /**
      * A class holding information for a 2d line, including points and slopes.
      */
     public static class Line {
@@ -36,7 +39,7 @@ public class ScatterPlot {
         public double m; // slope
         public double b; // y intercept
 
-        /*
+        /**
          * Creates a new line. The first two given values 
          * of the points will be used in data
          * @param A Point A
@@ -44,7 +47,7 @@ public class ScatterPlot {
          */
         public Line(Point A, Point B) {set(A, B);}
 
-        /*
+        /**
          * Sets existing parameters of a line
          * @param A Point A
          * @param B Point B
@@ -58,7 +61,7 @@ public class ScatterPlot {
             return this;
         }
 
-        /*
+        /**
          * Returns if line B collides with line A 
          * within line As point boundaries
          * @param A Line A
@@ -86,7 +89,7 @@ public class ScatterPlot {
             }
         }
 
-        /*
+        /**
          * Checks if two lines meet at a point
          * @param A Line A
          * @param B Lime B
@@ -116,7 +119,7 @@ public class ScatterPlot {
         }
     }
 
-    /*
+    /**
      * A class holding all information to
      * define a Triangle, including points,
      * lines, and boundaries.
@@ -131,7 +134,7 @@ public class ScatterPlot {
         public double y1, y2, y3;
         public double z1, z2, z3;
 
-        /*
+        /**
          * Creates a new triangle with defined points,
          * and assumed lines
          * @param A Point A
@@ -149,7 +152,7 @@ public class ScatterPlot {
             z1 = points[0].p[2]; z2 = points[1].p[2]; z3 = points[2].p[2];
         }
 
-        /*
+        /**
          * Checks if a given point is within
          * the boundaries of the triangle 
          * @returns true if the point is inside the triangle
@@ -182,7 +185,7 @@ public class ScatterPlot {
         
     }
 
-    /*
+    /**
      * Creates a scatterplot of any dimension
      * @param Points Any number of points to be initially plotted within
      * the scatterplot
@@ -193,8 +196,34 @@ public class ScatterPlot {
         if (Points.length > 0 && Points[0].p.length > 2) {CalcTrimesh();}
     }
 
+    /**
+     * Creates a scatter plot of any dimension
+     * @param PointFile A file containing points to be initially
+     * plotted
+     */
+    public ScatterPlot(File PointFile) {
+        List<Point> temp = new ArrayList<Point>();
+        try {
+            Scanner scanner = new Scanner(PointFile);
+            scanner.useDelimiter("[,|]");
+            while (scanner.hasNextFloat()) {
+                double x = scanner.nextFloat();
+                double y = scanner.nextFloat();
+                double z = scanner.nextFloat();
+                System.out.println(x + "," + y + "," + z);
 
-    /*
+                temp.add(new Point(x,y,z));
+            }
+            scanner.close();
+            System.out.println("All doubles parsed");
+        } catch (FileNotFoundException e) {e.printStackTrace(); System.out.println("File not accesable");}
+        for(Point p : PointSort(temp.toArray(new Point[0]))) {points.add(p);}
+
+        if (points.toArray().length > 0 && points.toArray(new Point[0])[0].p.length > 2) {CalcTrimesh();}
+    }
+
+
+    /**
      * Adds points to the existing scatterplot
      * @param Points Any number of points to be plotted 
      * within the scatterplot
@@ -207,7 +236,7 @@ public class ScatterPlot {
         if (Points.length > 0 && Points[0].p.length > 2) {CalcTrimesh();}
     }
 
-    /*
+    /**
      * Sorts given points from lowest X to highest X. (N^2)
      * @param pointArr Array of given points
      * @return pointArr of sorted points
@@ -227,7 +256,7 @@ public class ScatterPlot {
         return pointArr;
     }
 
-    /*
+    /**
      * Assumes an output based upon given data
      * at the given pition
      * @param inp Input coordinated to assume an output at,
@@ -323,7 +352,7 @@ public class ScatterPlot {
         Point[] par = points.toArray(new Point[0]);
 
         /**
-         * Term 2, parsing through all points 
+         * Term 1, parsing through all points 
          * from lowest x to highest x, and creating
          * lines in between
          */
@@ -331,7 +360,7 @@ public class ScatterPlot {
             lines.add(new Line(par[i], par[i+1]));
         }
 
-        /*
+        /**
          * Term 2, parsing through all points from
          * each point from lowest x to highest x, and attempting
          * to create a line. If the created line crosses an existing
@@ -357,10 +386,9 @@ public class ScatterPlot {
             }
         }
 
-        /*
+        /**
          * Triangle identification
          * 
-         * Rules are as follows:
          *  line A must share a point with line B, line C must not share
          *  the same point like A and B share, and line C must share a point
          *  with line A and line B.

@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +12,7 @@ import src.ScatterPlot.Triangle;
 
 public class Main {
     public static void main(String[] args) {
-        int sample = 100;
+        int sample = 1;
         int[] speeds = new int[sample];
         for (int s = 0; s < sample; s++) {
             List<Point> toAdd = new ArrayList<Point>();
@@ -27,18 +28,8 @@ public class Main {
                 toAdd.add(new Point(randInt.toArray(new Integer[0])[i], randInt.toArray(new Integer[0])[i + 1], randInt.toArray(new Integer[0])[i + 2]));
             }
              
-            ScatterPlot plot = new ScatterPlot(toAdd.toArray(new Point[0]));
+            ScatterPlot plot = new ScatterPlot(new File("C:\\Users\\User\\Desktop\\ScatterPlot\\ScatterLIB\\src\\Points.txt"));
             speeds[s] = plot.TrimeshSpeed;
         }
-
-        Arrays.sort(speeds);
-
-        int total = 0;
-        for (int i : speeds) {
-            System.out.print(i + ", ");
-            total += i;
-        }
-
-        System.out.println("Mean = " + total/sample);
     }
 }
